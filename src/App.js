@@ -4,11 +4,36 @@ import './App.css';
 import ShopPage from './code/shop/shop';
 import HomePage from './code/home/home';
 import Header from './code/header/header';
+import Login from './code/login/login';
+import { auth } from './code/firebase/firebase.util';
 
-function App() {
-  return (
+class App extends React.Component {
+
+  constructor() {
+    super();
+
+    this.state = {
+      currentUser: null
+    }
+  }
+
+  unsubscibeOnAuth = null;
+
+  componentDidMount() {
+    this.unsubscibeOnAuth = auth.onAuthStateChanged(user => {
+      this.setState({ currentUser: user });
+      console.log(user);
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscibeOnAuth();
+  }
+
+  render()
+  {return (
     <div>
-      <Header />
+      <Header currentUser={this.state.currentUser} />
       <Switch>
         <Route exact path="/" >
           <HomePage />
@@ -16,9 +41,12 @@ function App() {
         <Route path="/shop">
           <ShopPage />
         </Route>
+        <Route path="/login">
+          <Login />
+        </Route>
       </Switch>
     </div>
-  );
+  );}
 }
 
 export default App;
