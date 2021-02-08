@@ -20,15 +20,22 @@ class App extends React.Component {
   unsubscibeOnAuth = null;
 
   componentDidMount() {
-    this.unsubscibeOnAuth = auth.onAuthStateChanged(async user => {
-      if(user) {
-        const userRef = await createProfileDocument(user);
+    this.unsubscibeOnAuth = auth.onAuthStateChanged(async (user) => {
+      console.log("I am in auth changed");
+      
+      const userRef = await createProfileDocument(user);
+      if (userRef !== undefined) {
         userRef.onSnapshot(data => {
-          this.setState({ currentUser: {
-            id: data.id,
-            ...data.data()
-          }});
-        })
+          this.setState({
+            currentUser: {
+              id: data.id,
+              ...data.data()
+            }
+          });
+        });
+      } else {
+        this.setState({ currentUser: null });
+        console.log('User is not authenticated');
       }
     });
   }
@@ -37,23 +44,24 @@ class App extends React.Component {
     this.unsubscibeOnAuth();
   }
 
-  render()
-  {return (
-    <div>
-      <Header currentUser={this.state.currentUser} />
-      <Switch>
-        <Route exact path="/" >
-          <HomePage />
-        </Route>
-        <Route path="/shop">
-          <ShopPage />
-        </Route>
-        <Route path="/login">
-          <Login />
-        </Route>
-      </Switch>
-    </div>
-  );}
+  render() {
+    return (
+      <div>
+        <Header currentUser={this.state.currentUser} />
+        <Switch>
+          <Route exact path="/" >
+            <HomePage />
+          </Route>
+          <Route path="/shop">
+            <ShopPage />
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+        </Switch>
+      </div>
+    );
+  }
 }
 
 export default App;
