@@ -2,7 +2,16 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
 
-var firebaseConfig = // apply vault to get config;
+var firebaseConfig = {
+    apiKey: `${process.env.REACT_APP_FB_APIKEY}`,
+    authDomain: `${process.env.REACT_APP_FB_AUTHDOMAIN}`,
+    projectId: `${process.env.REACT_APP_FB_PROJECTID}`,
+    storageBucket: `${process.env.REACT_APP_FB_STORAGEBUCKET}`,
+    messagingSenderId: `${process.env.REACT_APP_FB_MESSAGINGSENDERID}`,
+    appId: `${process.env.REACT_APP_FB_APPID}`
+}
+
+// apply vault to get config;
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
