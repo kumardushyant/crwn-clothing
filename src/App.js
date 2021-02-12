@@ -6,6 +6,8 @@ import HomePage from './code/home/home';
 import Header from './code/header/header';
 import Login from './code/login/login';
 import { auth, createProfileDocument } from './code/firebase/firebase.util';
+import { connect } from 'react-redux';
+import {setCurrentUser} from './code/redux/user/user.action';
 
 class App extends React.Component {
 
@@ -20,23 +22,22 @@ class App extends React.Component {
   unsubscibeOnAuth = null;
 
   componentDidMount() {
+    const {setCurrentUser} = this.props;
     this.unsubscibeOnAuth = auth.onAuthStateChanged(async (user) => {
       console.log("I am in auth changed");
-      
-      const userRef = await createProfileDocument(user);
-      if (userRef !== undefined) {
-        userRef.onSnapshot(data => {
-          this.setState({
-            currentUser: {
+      if(user){
+        const userRef = await createProfileDocument(user);
+        if (userRef !== undefined) {
+          userRef.onSnapshot((data) => {
+            setCurrentUser({
               id: data.id,
-              ...data.data()
-            }
+              ...data.data(),
+            });
           });
-        });
-      } else {
-        this.setState({ currentUser: null });
-        console.log('User is not authenticated');
+        }
       }
+
+      setCurrentUser(user);
     });
   }
 
@@ -47,7 +48,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Header currentUser={this.state.currentUser} />
+        <Header />
         <Switch>
           <Route exact path="/" >
             <HomePage />
@@ -64,4 +65,8 @@ class App extends React.Component {
   }
 }
 
-export default App;
+const mapDispatchToProps = (dispatch) => ({
+  setCurrentUser: user => dispatch(setCurrentUser(user))
+});
+
+export default connect(null, mapDispatchToProps)(App);
